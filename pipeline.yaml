@@ -1,0 +1,13 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  image: openjdk:8-jdk
+  script:
+    - apt-get update && apt-get install -y curl
+    - curl -s https://get.sdkman.io | bash
+    - source "$HOME/.sdkman/bin/sdkman-init.sh"
+    - sdk install groovy
+    - groovy -version
+    - groovy Jenkinsfile.groovy
