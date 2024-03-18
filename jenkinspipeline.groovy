@@ -60,6 +60,36 @@ pipeline {
                 }
             }
         }
+        stage('SSH Commands') {
+            steps {
+                script {
+                    // SSH commands to 96.127.25
+                    sshScript remote: '96.127.25', user: 'your_ssh_username', password: 'your_ssh_password', script: '''
+                        # Verify files are being updated hourly
+                        ls -l /var/www/script_auto/files/rogers
+                        ls -l /var/www/script_auto/files/cogeco
+                        ls -l /var/www/script_auto/files/vtl
+                        ls -l /var/www/script_auto/files/cvcable
+
+                        # Verify servers have joined multicast groups
+                        netstat -ng | grep "239.250.10.\{1,2\}[0-9]"  # Range 239.250.10.1 to 239.250.10.14
+
+                        # Check network traffic on interface ens192
+                        bmon -p ens192
+
+                        # Verify disk space
+                        df -h
+
+                        # Check for table locks (only once per week)
+                        /usr/local/mariadb/columnstore/bin/viewtablelock
+
+                        # Restart MariaDB ColumnStore if needed
+                        # Add conditions to check for multiple or old locks and restart accordingly
+                        # Example: ma restartsystem if [condition]
+                    '''
+                }
+            }
+        }
     }
 
     post {
